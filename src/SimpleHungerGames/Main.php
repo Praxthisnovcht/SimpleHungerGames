@@ -2,6 +2,8 @@
 
 namespace SimpleHungerGames;
 
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\tile\Chest;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
@@ -57,7 +59,8 @@ class Main extends PluginBase{
                 "chest_items" => array(
                     array(252, 0, 1),
                     array(222, 0, 1)
-                )
+                ),
+                "show_top_stats" => 5
             )
         );
         $this->prefs->save();
@@ -133,5 +136,50 @@ class Main extends PluginBase{
                 }
             }
         }
+    }
+
+    public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+        if($command->getName() == "hg"){
+            if(!isset($args[0])){
+                $sender->sendMessage("[HG] HungerGames plugin by ".self::DEV.", version ".self::VER);
+                $sender->sendMessage("[HG] Type /hg help for a list of commands");
+                return true;
+            }
+            $subCommand = array_shift($args);
+            switch($subCommand){
+                case "help":
+                    $sender->sendMessage("[HG] Commands for hg:");
+                    $sender->sendMessage("[HG] /hg stat [player]: see a player stats");
+                    return true;
+                break;
+                case "stat":
+                    if(!isset($args[0])){
+                        if(!$this->points->exists($sender->getName())){
+                            $sender->sendMessage("[HG] Stats not found");
+                            return true;
+                        }
+                        $name = $sender->getName();
+                        $kills = $this->points->getNested("$name.kills");
+                        $deaths = $this->points->getNested("$name.deaths");
+                        $sender->sendMessage("[HG] Your stats:");
+                        $sender->sendMessage("[HG] Kills: ".$kills);
+                        $sender->sendMessage("[HG] Deaths: ".$deaths);
+                        return true;
+                    }
+                    $name = $args[0];
+                    if(!$this->points->exists($name)){
+                        $sender->sendMessage("[HG] Stats not found");
+                        return true;
+                    }
+                    $kills = $this->points->getNested("$name.kills");
+                    $deaths = $this->points->getNested("$name.deaths");
+                    $sender->sendMessage("[HG] ".$name." stats:");
+                    $sender->sendMessage("[HG] Kills: ".$kills);
+                    $sender->sendMessage("[HG] Deaths: ".$deaths);
+                    return true;
+                break;
+            }
+        }
+        return true;
     }
 }
