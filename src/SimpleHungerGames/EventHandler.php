@@ -46,8 +46,8 @@ class EventHandler implements Listener{
     public function onDeath(PlayerDeathEvent $event){
         $this->plugin->players = $this->plugin->players - 1;
         $name = $event->getEntity()->getName();
-        $d = $this->plugin->points->getNested("$name.kills") + 1;
-        $this->plugin->points->setNested("$name.kills", $d);
+        $d = $this->plugin->points->getNested("$name.deaths") + 1;
+        $this->plugin->points->setNested("$name.deaths", $d);
         $killer = $event->getEntity()->getLastDamageCause()->getCause()->getDamager();
         if($killer instanceof Player){
             $name = $killer->getName();
